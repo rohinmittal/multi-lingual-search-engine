@@ -5,20 +5,24 @@ margin-right:auto;
 }
 
 #searchBar {
-margin:auto;
-padding-top:10px;
-padding-bottom:0.1px;
 text-align:center;
 margin-left:auto;
 margin-right:auto;
 }
 
+#facetPlusResults{
+margin-top: 50px;
+}
+
 #facets{
-width:10%;
-background:gray;
+width:20%;
+float:left;
+overflow:auto;
+height:80%;
+position:fixed;
 }
 
 #results{
-width:90%;
-background:gray;
+width:80%;
+float:right;
 }

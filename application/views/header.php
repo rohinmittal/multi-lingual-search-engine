@@ -48,8 +48,3 @@ $languages = array('default' => 'All' , 'en' => 'English', 'fr' => 'French', 'es
 Language: <?php echo form_dropdown('language', $languages); ?>
 
 </p>
-
-<? 
-echo form_close();
-?>
-

@@ -2,7 +2,11 @@
 class Solr extends CI_Controller{
 	public function index(){
 		$this->load->helper('form');
+		$this->config->load('solr');
+		$client = $this->config->item('solr_client');
+		$serverName = $client['host'].":".$client['port']."/solr/".$client['core']."/select/?wt=json&facet=true&facet.field=tweet_hashtags&f.tweet_hashtags.facet.mincount=1&rows=10000&q=";
 
+echo $this->input->post('facet2');
 		$GLOBALS['queryString']='';
 
 		//translatedText : english version of all text_* | stemmed 
@@ -29,11 +33,11 @@ class Solr extends CI_Controller{
 			$GLOBALS['queryString'] = $GLOBALS['queryString'].'&fq=-text:'.rawurlencode($this->input->post('noneWord')); 
 		}
 
-		$json = "http://rohinmittal.koding.io:8983/solr/cse535/select/?wt=json&rows=10000&q=".$GLOBALS['queryString'];
+		$json = $serverName.$GLOBALS['queryString'];
 
 		$jsonfile = file_get_contents($json);
 		$responseData = json_decode($jsonfile, TRUE);
-		$data=array('resultset' => $responseData['response']['docs']);
+		$data=array('resultset' => $responseData['response']['docs'], 'facets' => $responseData['facet_counts']['facet_fields']['tweet_hashtags']);
 
 		foreach ($data['resultset'] as $document) {
 			foreach ($document as $field => $value) {
