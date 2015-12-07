@@ -37,7 +37,7 @@ echo $this->input->post('facet2');
 
 		$jsonfile = file_get_contents($json);
 		$responseData = json_decode($jsonfile, TRUE);
-		$data=array('resultset' => $responseData['response']['docs'], 'facets' => $responseData['facet_counts']['facet_fields']['tweet_hashtags']);
+		$data=array('httpLink' => $json, 'resultset' => $responseData['response']['docs'], 'facets' => $responseData['facet_counts']['facet_fields']['tweet_hashtags']);
 
 		foreach ($data['resultset'] as $document) {
 			foreach ($document as $field => $value) {
@@ -47,6 +47,25 @@ echo $this->input->post('facet2');
 			}   
 		}
 
+		$this->load->view('header');
+		$this->load->view('results', $data);
+		$this->load->view('footer');
+	}
+	
+	public function facet() {
+		$GLOBALS['facets'] = '';
+		$this->load->helper('form');
+		for($i=0; $i < $this->input->post('facetCount'); $i=$i+2) {
+			if($this->input->post('facet'.$i) != '') {
+				$GLOBALS['facets'] = $GLOBALS['facets'].'&fq=text:'.$this->input->post('facet'.$i);
+			}
+		}
+		$facetLink = $this->input->post('httpLink').$GLOBALS['facets'];
+		echo $facetLink;
+		$jsonfile = file_get_contents($facetLink);
+		$responseData = json_decode($jsonfile, TRUE);
+
+		$data=array('httpLink' => $this->input->post('httpLink'), 'resultset' => $responseData['response']['docs'], 'facets' => $this->input->post('facets'));
 		$this->load->view('header');
 		$this->load->view('results', $data);
 		$this->load->view('footer');
