@@ -3,7 +3,10 @@ class Solr extends CI_Controller{
 	public function index(){
 		$this->load->helper('form');
 		$this->config->load('solr');
+		$bingCred = array('clientID' => 'Blahhhhh', 'clientSecret' => 'QlBeF5hpqSbC4p3VELZ7LV92QtbtPi40MC/5MsZAFhk=');
+		$this->load->library('Bing', $bingCred); 
 		$client = $this->config->item('solr_client');
+
 		$serverName = $client['host'].":".$client['port']."/solr/".$client['core']."/select/?wt=json&facet=true&facet.field=content_tags&facet.field=lang&f.content_tags.facet.mincount=1&rows=10000&fl=username&fl=text&fl=translated_text&fl=location&fl=tweet_hashtags&fl=tweet_urls&facet.limit=10&fl=content_tags&q=";
 
 echo $this->input->post('facet2');
@@ -14,8 +17,8 @@ echo $this->input->post('facet2');
 		//text : orginal text | not stemmed
 
 		if($this->input->post('query') != '') {
-			//make it translatedText later
-			$GLOBALS['queryString'] = 'translated_text:'.rawurlencode($this->input->post('query')); 
+			$translation = $this->bing->getTranslation('ru', 'en', $this->input->post('query'));
+			$GLOBALS['queryString'] = 'translated_text:'.rawurlencode($translation); 
 		}
 
 		if($this->input->post('language') != 'default') {
