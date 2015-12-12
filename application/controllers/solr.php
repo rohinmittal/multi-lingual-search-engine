@@ -17,8 +17,14 @@ echo $this->input->post('facet2');
 		//text : orginal text | not stemmed
 
 		if($this->input->post('query') != '') {
-			$translation = $this->bing->getTranslation('ru', 'en', $this->input->post('query'));
-			$GLOBALS['queryString'] = 'translated_text:'.rawurlencode($translation); 
+			$inputQuery = $this->input->post('query');
+			if (strlen($inputQuery) > 1) {
+			$langDetect = 'http://ws.detectlanguage.com/0.2/detect?q='.rawurlencode($inputQuery).'&key=f1b2095ccfb94d062ed7b06032ad8555';
+			$langResult = json_decode(file_get_contents($langDetect), TRUE);
+
+			$inputQuery = $this->bing->getTranslation($langResult['data']['detections'][0]['language'], 'en', $inputQuery);
+			}
+			$GLOBALS['queryString'] = 'translated_text:'.rawurlencode($inputQuery); 
 		}
 
 		if($this->input->post('language') != 'default') {

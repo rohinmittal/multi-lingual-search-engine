@@ -7,7 +7,9 @@ echo form_open('Solr/facet');
 echo form_hidden('httpLink', $httpLink);
 ?>
 
-<input type="button" onclick="return toggleMe('lang')" value="Languages:">
+<!-- http://www.bestcssbuttongenerator.com/#/2
+-->
+<input type="button" onclick="return toggleMe('lang')" value="Languages:" class="myButton">
 <p id="lang" style="display:none">
 <?php
 if(!empty($languages)) {
@@ -27,7 +29,7 @@ if(!empty($languages)) {
 </p>
 
 <br>
-<input type="button" onclick="return toggleMe('facet')" value="Content Tags:">
+<input type="button" onclick="return toggleMe('facet')" value="Content Tags:" class="myButton">
 <p id="facet" style="display:none">
 <?php
 if(!empty($facets)) {
