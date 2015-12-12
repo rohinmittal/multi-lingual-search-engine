@@ -1,17 +1,17 @@
 body{
 width:95%;
-margin-left:auto;
-margin-right:auto;
+      margin-left:auto;
+      margin-right:auto;
 }
 
 #searchBar {
-text-align:center;
-margin-left:auto;
-margin-right:auto;
+	text-align:center;
+	margin-left:auto;
+	margin-right:auto;
 }
 
 #facetPlusResults{
-margin-top: 50px;
+	margin-top: 50px;
 }
 
 #facets{
@@ -26,3 +26,4 @@ position:fixed;
 width:80%;
 float:right;
 }
+

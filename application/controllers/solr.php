@@ -4,7 +4,7 @@ class Solr extends CI_Controller{
 		$this->load->helper('form');
 		$this->config->load('solr');
 		$client = $this->config->item('solr_client');
-		$serverName = $client['host'].":".$client['port']."/solr/".$client['core']."/select/?wt=json&facet=true&facet.field=tweet_hashtags&f.tweet_hashtags.facet.mincount=1&rows=10000&q=";
+		$serverName = $client['host'].":".$client['port']."/solr/".$client['core']."/select/?wt=json&facet=true&facet.field=content_tags&facet.field=lang&f.content_tags.facet.mincount=1&rows=10000&fl=username&fl=text&fl=translated_text&fl=location&fl=tweet_hashtags&fl=tweet_urls&facet.limit=10&fl=content_tags&q=";
 
 echo $this->input->post('facet2');
 		$GLOBALS['queryString']='';
@@ -15,7 +15,7 @@ echo $this->input->post('facet2');
 
 		if($this->input->post('query') != '') {
 			//make it translatedText later
-			$GLOBALS['queryString'] = 'text:'.rawurlencode($this->input->post('query')); 
+			$GLOBALS['queryString'] = 'translated_text:'.rawurlencode($this->input->post('query')); 
 		}
 
 		if($this->input->post('language') != 'default') {
@@ -25,27 +25,20 @@ echo $this->input->post('facet2');
 
 		if($this->input->post('exactWord') != '') {
 			//exact word 
-			$GLOBALS['queryString'] = $GLOBALS['queryString'].'&fq=text:'.rawurlencode($this->input->post('exactWord')); 
+			$GLOBALS['queryString'] = $GLOBALS['queryString'].'&fq=translated_text:'.rawurlencode($this->input->post('exactWord')); 
 		}
 
 		if($this->input->post('noneWord') != '') {
 			//none of the words word 
-			$GLOBALS['queryString'] = $GLOBALS['queryString'].'&fq=-text:'.rawurlencode($this->input->post('noneWord')); 
+			$GLOBALS['queryString'] = $GLOBALS['queryString'].'&fq=-translated_text:'.rawurlencode($this->input->post('noneWord')); 
 		}
 
 		$json = $serverName.$GLOBALS['queryString'];
 
 		$jsonfile = file_get_contents($json);
+		echo $json;
 		$responseData = json_decode($jsonfile, TRUE);
-		$data=array('httpLink' => $json, 'resultset' => $responseData['response']['docs'], 'facets' => $responseData['facet_counts']['facet_fields']['tweet_hashtags']);
-
-		foreach ($data['resultset'] as $document) {
-			foreach ($document as $field => $value) {
-				if (is_array($value)) {
-					$value = implode(', ', $value);
-				}   
-			}   
-		}
+		$data=array('httpLink' => $json, 'resultset' => $responseData['response']['docs'], 'facets' => $responseData['facet_counts']['facet_fields']['content_tags'], 'languages' => $responseData['facet_counts']['facet_fields']['lang']);
 
 		$this->load->view('header');
 		$this->load->view('results', $data);
@@ -57,15 +50,21 @@ echo $this->input->post('facet2');
 		$this->load->helper('form');
 		for($i=0; $i < $this->input->post('facetCount'); $i=$i+2) {
 			if($this->input->post('facet'.$i) != '') {
-				$GLOBALS['facets'] = $GLOBALS['facets'].'&fq=text:'.$this->input->post('facet'.$i);
+				$GLOBALS['facets'] = $GLOBALS['facets'].'&fq=content_tags:'.$this->input->post('facet'.$i);
 			}
 		}
+		for($i=0; $i < $this->input->post('langCount'); $i=$i+2) {
+					if($this->input->post('language'.$i) !=''){
+				$GLOBALS['facets'] = $GLOBALS['facets'].'&fq=lang:'.$this->input->post('language'.$i);
+			}
+		}
+		
 		$facetLink = $this->input->post('httpLink').$GLOBALS['facets'];
 		echo $facetLink;
 		$jsonfile = file_get_contents($facetLink);
 		$responseData = json_decode($jsonfile, TRUE);
 
-		$data=array('httpLink' => $this->input->post('httpLink'), 'resultset' => $responseData['response']['docs'], 'facets' => $this->input->post('facets'));
+		$data=array('httpLink' => $this->input->post('httpLink'), 'resultset' => $responseData['response']['docs'], 'facets' => $this->input->post('facets'), 'languages' => $this->input->post('languages'));
 		$this->load->view('header');
 		$this->load->view('results', $data);
 		$this->load->view('footer');
