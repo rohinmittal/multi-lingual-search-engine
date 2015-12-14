@@ -27,7 +27,13 @@ function toggleMe(arg){
 echo form_open('Solr/index');
 
 $_POST=array();
-$languages = array('default' => 'All' , 'en' => 'English', 'fr' => 'French', 'es' => 'Spanish', 'de' => 'German', 'ru' => 'Russian');
+$languages = array(
+	'default' => 'All' ,
+	'en' => 'English',
+	'fr' => 'French',
+	'es' => 'Spanish',
+	'de' => 'German',
+	'ru' => 'Russian');
 
 $options = array('style'=>'width:50%');
 echo form_input('query', '', $options).'     ';

@@ -7,7 +7,7 @@ class Solr extends CI_Controller{
 		$this->load->library('Bing', $bingCred);
 		$client = $this->config->item('solr_client');
 
-		$serverName = $client['host'].":".$client['port']."/solr/".$client['core']."/select/?wt=json&facet=true&facet.field=content_tags&facet.field=lang&f.content_tags.facet.mincount=1&rows=10000&fl=username&fl=text&fl=translated_text&fl=location&fl=tweet_hashtags&fl=tweet_urls&facet.limit=10&fl=content_tags";
+		$serverName = $client['host'].":".$client['port']."/solr/".$client['core']."/select/?wt=json&facet=true&facet.field=content_tags&facet.field=lang&facet.field=username&facet.field=tweet_hashtags&f.content_tags.facet.mincount=1&rows=10000&fl=username&fl=text&fl=translated_text&fl=location&fl=tweet_hashtags&fl=tweet_urls&facet.limit=10&fl=content_tags";
 
 		$GLOBALS['queryString']='';
 
@@ -47,7 +47,14 @@ class Solr extends CI_Controller{
 		$json = $serverName.$GLOBALS['queryString'];
 		$jsonfile = file_get_contents($json);
 		$responseData = json_decode($jsonfile, TRUE);
-		$data=array('httpLink' => $json, 'resultset' => $responseData['response']['docs'], 'facets' => $responseData['facet_counts']['facet_fields']['content_tags'], 'languages' => $responseData['facet_counts']['facet_fields']['lang']);
+		$data=array(
+			'httpLink' => $json,
+			'resultset' => $responseData['response']['docs'],
+			'content_tags' => $responseData['facet_counts']['facet_fields']['content_tags'],
+			'languages' => $responseData['facet_counts']['facet_fields']['lang'],
+			'usernames' => $responseData['facet_counts']['facet_fields']['username'],
+			'hashtags' => $responseData['facet_counts']['facet_fields']['tweet_hashtags']
+		);
 
 		$this->load->view('header');
 		$this->load->view('results', $data);
@@ -57,13 +64,15 @@ class Solr extends CI_Controller{
 	public function facet() {
 		$GLOBALS['facets'] = '';
 		$this->load->helper('form');
-		for($i=0; $i < $this->input->post('facetCount'); $i=$i+2) {
-			if($this->input->post('facet'.$i) != '') {
-				$GLOBALS['facets'] = $GLOBALS['facets'].'&fq=content_tags:'.$this->input->post('facet'.$i);
+		
+		for($i=0; $i < $this->input->post('content_tagsCount'); $i=$i+2) {
+			if($this->input->post('content_tag'.$i) != '') {
+				$GLOBALS['facets'] = $GLOBALS['facets'].'&fq=content_tags:'.$this->input->post('content_tag'.$i);
 			}
 		}
+
 		for($i=0; $i < $this->input->post('langCount'); $i=$i+2) {
-					if($this->input->post('language'.$i) !=''){
+			if($this->input->post('language'.$i) !=''){
 				$GLOBALS['facets'] = $GLOBALS['facets'].'&fq=lang:'.$this->input->post('language'.$i);
 			}
 		}
@@ -72,7 +81,15 @@ class Solr extends CI_Controller{
 		$jsonfile = file_get_contents($facetLink);
 		$responseData = json_decode($jsonfile, TRUE);
 
-		$data=array('httpLink' => $this->input->post('httpLink'), 'resultset' => $responseData['response']['docs'], 'facets' => $this->input->post('facets'), 'languages' => $this->input->post('languages'));
+		$data=array(
+			'httpLink' => $this->input->post('httpLink'),
+			'resultset' => $responseData['response']['docs'],
+			'content_tags' => $this->input->post('content_tags'),
+			'languages' => $this->input->post('languages'),
+			'usernames' => $this->input->post('usernames'),
+			'hashtags' => $this->input->post('tweet_hashtags')
+		);
+
 		$this->load->view('header');
 		$this->load->view('results', $data);
 		$this->load->view('footer');

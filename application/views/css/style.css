@@ -19,15 +19,23 @@ overflow:auto;
 position:fixed;
 }
 
+#topTwitters{
+top:15%;
+width:15%;
+float:right;
+overflow:auto;
+}
+
 #results{
 top:15%;
-width:78%;
-float:right;
+width:60%;
 overflow:auto;
 height:70%;
 position:fixed;
 left:22%;
 }
+
+
 .myButton {
 	background-color:#44c767;
 	-moz-border-radius:28px;
