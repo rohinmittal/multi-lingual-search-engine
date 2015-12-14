@@ -84,10 +84,28 @@ foreach ($resultset as $document) {
 		if (is_array($value)) {
 			$value = implode(', ', $value);
 		}
-		if($field!='tweet_urls')
+		if($field == 'username') {
+			$field = 'Username:';
+		}
+		else if($field == 'text') {
+			$field = 'Tweet:';
+		}
+		else if($field == 'content_tags') {
+			$field = 'Tags:';
+		}
+		else if($field == 'tweet_hashtags') {
+			$field = 'Hashtags:';
+		}
+		else if($field == 'tweet_urls') {
+			$field = 'URL:';
+		}
+
+		if($field !='URL:') {
 			echo '<tr><th>' . $field . '</th><td>' . $value . '</td></tr>';
-		else
+		}
+		else {
 			echo '<tr><th>' . $field . '</th><td> <a href='.$value.' target=_blank>'.$value.'</a>  </td></tr>';
+		}
 	}
 	echo '</table>';
 }
