@@ -1,5 +1,3 @@
-<title> Search Engine </title>
-
 <div id="facets">
 <?php
 echo "<br/>";
@@ -7,13 +5,10 @@ echo form_open('Solr/facet');
 echo form_hidden('httpLink', $httpLink);
 ?>
 
-<!-- http://www.bestcssbuttongenerator.com/#/2
--->
 <input type="button" onclick="return toggleMe('lang')" value="Languages:" class="myButton">
 <p id="lang" style="display:none">
 <?php
 if(!empty($languages)) {
-	if($languages[1] != 0) {
 	echo form_open('Solr/facet');
 	for($i = 0; $i < count($languages); $i=$i+2) {
 		$langID = "language".$i;
@@ -23,7 +18,6 @@ if(!empty($languages)) {
 	}
 	echo form_hidden('langCount', count($languages));
 	echo form_hidden('languages', $languages);
-	}
 }
 ?>
 </p>
@@ -47,9 +41,13 @@ if(!empty($facets)) {
 
 <?php
 echo "<br/>";
-echo form_submit('submit', 'Refine Results');
-echo form_close();
+echo "<br/>";
+echo "<br/>";
+?>
+<input type="submit" name="submit" value="RefineResults" class="refineButton" />
 
+<?
+echo form_close();
 ?>
 </div>
 
@@ -70,12 +68,10 @@ foreach ($resultset as $document) {
 		if($field!='tweet_urls')
 			echo '<tr><th>' . $field . '</th><td>' . $value . '</td></tr>';
 		else
-			echo '<tr><th>' . $field . '</th><td> <a href='.$value.' target=_blank>'.$value.'</a>  </td></tr>'; 
-			
+			echo '<tr><th>' . $field . '</th><td> <a href='.$value.' target=_blank>'.$value.'</a>  </td></tr>';
+
 	}
 	echo '</table>';
 }
 ?>
 </div>
-
-
