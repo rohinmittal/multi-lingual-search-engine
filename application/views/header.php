@@ -12,6 +12,15 @@ function toggleMe(arg){
 		return true;
 	if(e.style.display=="none"){
 		e.style.display="block";
+		if(arg != 'lang') {
+			document.getElementById('lang').style.display="none";
+		}
+		if(arg != 'content_tags') {
+			document.getElementById('content_tags').style.display="none";
+		}
+		if(arg != 'usernames') {
+			document.getElementById('usernames').style.display="none";
+		}
 	}
 	else{
 		e.style.display="none";
@@ -26,7 +35,6 @@ function toggleMe(arg){
 <?php
 echo form_open('Solr/index');
 
-$_POST=array();
 $languages = array(
 	'default' => 'All' ,
 	'en' => 'English',
@@ -39,8 +47,8 @@ $options = array('style'=>'width:50%');
 echo form_input('query', '', $options).'     ';
 echo form_dropdown('language', $languages);
 echo '<br>';
-echo form_checkbox('exactWord', '1').' Exact Word or phrase. ';
-echo form_checkbox('noneWord', '1').'None of these words. ';
+echo form_checkbox('exactWord', '1', isset($_POST['exactWord'])?$_POST['exactWord']:'').' Exact Word or phrase. ';
+echo form_checkbox('noneWord', '1', isset($_POST['noneWord'])?$_POST['noneWord']:'').'None of these words. ';
 echo '<br/>';
 echo form_submit('submit', 'Search');
 echo form_close();

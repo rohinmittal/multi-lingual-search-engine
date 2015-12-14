@@ -30,7 +30,7 @@ if(!empty($languages)) {
 if(!empty($content_tags)) {
 	for($i = 0; $i < count($content_tags); $i=$i+2) {
 		$tagID = "content_tag".$i;
-		echo form_checkbox($tagID, $content_tags[$i], '');
+		echo form_checkbox($tagID, $content_tags[$i], isset($_POST[$tagID])?$_POST[$tagID]:'');
 		echo $content_tags[$i]." [".$content_tags[$i+1]."]";
 		echo "<br/>";
 	}
@@ -46,13 +46,12 @@ if(!empty($content_tags)) {
 <p id="usernames" style="display:none">
 <?php
 if(!empty($usernames)) {
-	echo 'Top Twitters for query: ';
 	echo '<br/>';
 	for($i = 0; $i < count($usernames); $i=$i+2) {
-		if($usernames[$i+1] > 0) {
-			echo '['.$usernames[$i+1].'] '.$usernames[$i];
-			echo "<br/>";
-		}
+		$usernameID = "username".$i;
+		echo form_checkbox($usernameID, $usernames[$i], isset($_POST[$usernameID])?$_POST[$usernameID]:'');
+		echo $usernames[$i]." [".$usernames[$i+1]."]";
+		echo "<br/>";
 	}
 	echo form_hidden('usernames_count', count($usernames));
 	echo form_hidden('usernames', $usernames);
@@ -97,19 +96,6 @@ foreach ($resultset as $document) {
 
 <div id='topTwitters'>
 	<?php
-	if(!empty($usernames)) {
-		echo 'Top Twitters for query: ';
-		echo '<br/>';
-		for($i = 0; $i < count($usernames); $i=$i+2) {
-			if($usernames[$i+1] > 0) {
-				echo '['.$usernames[$i+1].'] '.$usernames[$i];
-				echo "<br/>";
-			}
-		}
-		echo form_hidden('usernames_count', count($usernames));
-		echo form_hidden('usernames', $usernames);
-	}
-
 	if(!empty($hashtags)) {
 		echo '<br/>';
 		echo 'Top hashtags: ';

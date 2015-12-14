@@ -7,7 +7,7 @@ class Solr extends CI_Controller{
 		$this->load->library('Bing', $bingCred);
 		$client = $this->config->item('solr_client');
 
-		$serverName = $client['host'].":".$client['port']."/solr/".$client['core']."/select/?wt=json&facet=true&facet.field=content_tags&facet.field=lang&facet.field=username&facet.field=tweet_hashtags&f.content_tags.facet.mincount=1&rows=10000&fl=username&fl=text&fl=translated_text&fl=location&fl=tweet_hashtags&fl=tweet_urls&facet.limit=10&fl=content_tags";
+		$serverName = $client['host'].":".$client['port']."/solr/".$client['core']."/select/?wt=json&facet=true&facet.field=content_tags&facet.field=lang&facet.field=username&facet.field=tweet_hashtags&f.content_tags.facet.mincount=1&rows=10000&fl=username&fl=text&fl=translated_text&fl=tweet_hashtags&fl=tweet_urls&facet.limit=10&fl=content_tags";
 
 		$GLOBALS['queryString']='';
 
@@ -63,18 +63,40 @@ class Solr extends CI_Controller{
 
 	public function facet() {
 		$GLOBALS['facets'] = '';
+		$GLOBALS['usernames'] = '';
+		$GLOBALS['content_tags'] = '';
+		$GLOBALS['languages'] = '';
+
 		$this->load->helper('form');
-		
+
 		for($i=0; $i < $this->input->post('content_tagsCount'); $i=$i+2) {
 			if($this->input->post('content_tag'.$i) != '') {
-				$GLOBALS['facets'] = $GLOBALS['facets'].'&fq=content_tags:'.$this->input->post('content_tag'.$i);
+				$GLOBALS['content_tags'] = $GLOBALS['content_tags'].'"'.rawurlencode($this->input->post('content_tag'.$i)).'"OR';
 			}
+		}
+
+		if($GLOBALS['content_tags'] != '') {
+			$GLOBALS['facets'] = $GLOBALS['facets'].'&fq=content_tags:('.$GLOBALS['content_tags'].'"")';
 		}
 
 		for($i=0; $i < $this->input->post('langCount'); $i=$i+2) {
 			if($this->input->post('language'.$i) !=''){
-				$GLOBALS['facets'] = $GLOBALS['facets'].'&fq=lang:'.$this->input->post('language'.$i);
+				$GLOBALS['languages'] = $GLOBALS['languages'].'"'.rawurlencode($this->input->post('language'.$i)).'"OR';
 			}
+		}
+
+		if($GLOBALS['languages'] != '') {
+			$GLOBALS['facets'] = $GLOBALS['facets'].'&fq=lang:('.$GLOBALS['languages'].'"")';
+		}
+
+		for($i=0; $i < $this->input->post('usernames_count'); $i=$i+2) {
+			if($this->input->post('username'.$i) !=''){
+				$GLOBALS['usernames'] = $GLOBALS['usernames'].'"'.rawurlencode($this->input->post('username'.$i)).'"OR';
+			}
+		}
+
+		if($GLOBALS['usernames'] != '') {
+			$GLOBALS['facets'] = $GLOBALS['facets'].'&fq=username:('.$GLOBALS['usernames'].'"")';
 		}
 
 		$facetLink = $this->input->post('httpLink').$GLOBALS['facets'];
