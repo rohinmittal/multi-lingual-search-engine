@@ -10,32 +10,30 @@ class Solr extends CI_Controller{
 		$serverName = $client['host'].":".$client['port']."/solr/".$client['core']."/select/?wt=json&facet=true&facet.field=content_tags&facet.field=lang&facet.field=username&facet.field=tweet_hashtags&f.content_tags.facet.mincount=1&rows=10000&fl=username&fl=text&fl=translated_text&fl=tweet_hashtags&fl=tweet_urls&facet.limit=10&fl=content_tags";
 
 		$GLOBALS['queryString']='';
-
-		//translatedText : english version of all text_* | stemmed
-		//text_* : native laguage text | stemmed
-		//text : orginal text | not stemmed
-
 		if($this->input->post('query') != '') {
 			// input query is mandatory.
 			$inputQuery = $this->input->post('query');
 			if($this->input->post('exactWord') == 1) {
 				// if user selects exactWord checkbox
-				$GLOBALS['queryString'] = $GLOBALS['queryString'].'&q=text:'.rawurlencode($inputQuery);
+				$GLOBALS['queryString'] = $GLOBALS['queryString'].'&q=text:"'.rawurlencode($inputQuery).'"';
 			}
 			else if($this->input->post('noneWord') == 1) {
 				// if useer selects none of these checkbox
-				$GLOBALS['queryString'] = $GLOBALS['queryString'].'&q=-text:'.rawurlencode($inputQuery);
+				$GLOBALS['queryString'] = $GLOBALS['queryString'].'&q=-text:"'.rawurlencode($inputQuery).'"';
 			}
 			else {
-
-/*				if (strlen($inputQuery) > 1) {
-					$langDetect = 'http://ws.detectlanguage.com/0.2/detect?q='.rawurlencode($inputQuery).'&key=f1b2095ccfb94d062ed7b06032ad8555';
-					$langResult = json_decode(file_get_contents($langDetect), TRUE);
-					echo $langResult['data']['detections'][0]['language'];
-					$inputQuery = $this->bing->getTranslation($langResult['data']['detections'][0]['language'], 'en', $inputQuery);
+				/*			$langDetect = 'http://ws.detectlanguage.com/0.2/detect?q='.rawurlencode($inputQuery).'&key=f1b2095ccfb94d062ed7b06032ad8555';
+							$langResult = json_decode(file_get_contents($langDetect), TRUE);
+							echo $langResult['data']['detections'][0]['language']; */
+				$temp = $this->bing->getTranslation('auto', 'en', $inputQuery);
+				if(substr_compare($temp, 'Argument ExceptionMethod', 0, 15) != 0) {
+					// if translated
+					$inputQuery = $temp;
+					$GLOBALS['queryString'] = '&q=translated_text:'.rawurlencode($inputQuery);
 				}
-				*/
-				$GLOBALS['queryString'] = '&q=translated_text:'.rawurlencode($inputQuery);
+				else {
+					$GLOBALS['queryString'] = '&q=text:'.rawurlencode($inputQuery);
+				}
 			}
 
 			if($this->input->post('language') != 'default') {
@@ -48,16 +46,19 @@ class Solr extends CI_Controller{
 		$jsonfile = file_get_contents($json);
 		$responseData = json_decode($jsonfile, TRUE);
 		$data=array(
-			'httpLink' => $json,
-			'resultset' => $responseData['response']['docs'],
-			'content_tags' => $responseData['facet_counts']['facet_fields']['content_tags'],
-			'languages' => $responseData['facet_counts']['facet_fields']['lang'],
-			'usernames' => $responseData['facet_counts']['facet_fields']['username'],
-			'hashtags' => $responseData['facet_counts']['facet_fields']['tweet_hashtags']
-		);
+				'queryString' => $this->input->post('query'),
+				'exactWord' => $this->input->post('exactWord'),
+				'noneWord' => $this->input->post('noneWord'),
+				'httpLink' => $json,
+				'resultset' => $responseData['response']['docs'],
+				'content_tags' => $responseData['facet_counts']['facet_fields']['content_tags'],
+				'languages' => $responseData['facet_counts']['facet_fields']['lang'],
+				'usernames' => $responseData['facet_counts']['facet_fields']['username'],
+				'hashtags' => $responseData['facet_counts']['facet_fields']['tweet_hashtags']
+			   );
 
-		$this->load->view('header');
-		$this->load->view('results', $data);
+		$this->load->view('header', $data);
+		$this->load->view('results');
 		$this->load->view('footer');
 	}
 
@@ -104,16 +105,19 @@ class Solr extends CI_Controller{
 		$responseData = json_decode($jsonfile, TRUE);
 
 		$data=array(
-			'httpLink' => $this->input->post('httpLink'),
-			'resultset' => $responseData['response']['docs'],
-			'content_tags' => $this->input->post('content_tags'),
-			'languages' => $this->input->post('languages'),
-			'usernames' => $this->input->post('usernames'),
-			'hashtags' => $this->input->post('tweet_hashtags')
-		);
+				'httpLink' => $this->input->post('httpLink'),
+				'queryString' => $this->input->post('query'),
+				'exactWord' => $this->input->post('exactWord'),
+				'noneWord' => $this->input->post('noneWord'),
+				'resultset' => $responseData['response']['docs'],
+				'content_tags' => $this->input->post('content_tags'),
+				'languages' => $this->input->post('languages'),
+				'usernames' => $this->input->post('usernames'),
+				'hashtags' => $this->input->post('hashtags')
+			   );
 
-		$this->load->view('header');
-		$this->load->view('results', $data);
+		$this->load->view('header', $data);
+		$this->load->view('results');
 		$this->load->view('footer');
 	}
 }

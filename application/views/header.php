@@ -44,7 +44,7 @@ $languages = array(
 	'ru' => 'Russian');
 
 $options = array('style'=>'width:50%');
-echo form_input('query', '', $options).'     ';
+echo form_input('query', isset($_POST['query'])?$_POST['query']:'', $options);
 echo form_dropdown('language', $languages);
 echo '<br>';
 echo form_checkbox('exactWord', '1', isset($_POST['exactWord'])?$_POST['exactWord']:'').' Exact Word or phrase. ';
