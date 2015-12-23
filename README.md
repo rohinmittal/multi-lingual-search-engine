@@ -1,5 +1,3 @@
-Solr integration with CodeIgniter. Solarium library is used.
+Solr integration with CodeIgniter. 
 
-- Clone this repository.
-- Update your solr configuration settings at : application/config/solr.php
-- check: index.php/homepage
+MVC Architecture is used and the files are available in application directory.
